@@ -14,6 +14,6 @@
     <string name="error_binary">Invalid Binary Number</string>
     <string name="error_oct">Invalid Octal Number</string>
     <string name="error_hex">Invalid Hex Number</string>
-    <string name="error_decimal">Error</string>
+    <string name="error_decimal">Invalid Decimal Number</string>
     <string name="error_out_of_range">Out of range!</string>
 </resources>

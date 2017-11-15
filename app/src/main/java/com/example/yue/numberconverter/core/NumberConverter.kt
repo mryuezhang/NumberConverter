@@ -140,7 +140,6 @@ class NumberConverter {
         fun decimalToBinary_OnesComplement(p0: String, bitLength: Int): String = when {
             p0 == "" -> ""
             p0.contains("-") -> String(SimpleMath.formatBinary(decimalToBinary(p0.replace("-", "")), bitLength)
-                    .replace(" ", "")
                     .map { SimpleMath.flipBit(it) }
                     .toCharArray())
             else -> SimpleMath.formatBinary(decimalToBinary(p0), bitLength)

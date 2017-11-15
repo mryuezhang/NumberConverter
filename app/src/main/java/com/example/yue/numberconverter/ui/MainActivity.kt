@@ -27,7 +27,6 @@ import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
-import android.util.Log
 import android.view.MenuItem
 import android.widget.EditText
 import android.widget.RadioButton
@@ -84,6 +83,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             (it as EditText).text.clear()
             true
         }
+
             it.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(p0: Editable?) {
                 }
@@ -92,44 +92,50 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
 
                 override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    val input = p0.toString()
                     if (it.hasFocus()){
                         when(it){
                             decimal_input -> {
-                                if (!rangeCheck_Decimal(p0.toString())){
+                                if (!SimpleMath.isValidDecimal(input)){
                                     setErrorColor(decimal, decimal_input)
-                                    decimal.text = resources.getString(R.string.error_out_of_range)
-
+                                    decimal.text = resources.getString(R.string.error_decimal)
                                 }
                                 else {
-                                    resetColor_Decimal()
-                                    Log.i(null, getBitRepresentation().toString())
-                                    when (getBitRepresentation()){
-                                        0 -> {
-                                            binary_input.setText(SimpleMath.formatBinary(NumberConverter.decimalToBinary(decimal_input.text.toString()), getBitLength()), TextView.BufferType.EDITABLE)
-                                            octal_input.setText(NumberConverter.decimalToOctal(decimal_input.text.toString()), TextView.BufferType.EDITABLE)
-                                            hexadecimal_input.setText(NumberConverter.decimalToHexadecimal(decimal_input.text.toString()), TextView.BufferType.EDITABLE)
-                                        }
-                                        1 -> {
-                                            val binaryValue = NumberConverter.decimalToBinary_OnesComplement(decimal_input.text.toString(), getBitLength())
-                                            binary_input.setText(binaryValue, TextView.BufferType.EDITABLE)
-                                            octal_input.setText(NumberConverter.binaryToOctal(binaryValue), TextView.BufferType.EDITABLE)
-                                            hexadecimal_input.setText(NumberConverter.binaryToHexadecimal(binaryValue), TextView.BufferType.EDITABLE)
-                                        }
-                                        else -> {
-                                            binary_input.setText(NumberConverter.decimalToBinary_OnesComplement(decimal_input.text.toString(), getBitLength()), TextView.BufferType.EDITABLE)
-                                            octal_input.setText(NumberConverter.decimalToOctal(decimal_input.text.toString()), TextView.BufferType.EDITABLE)
-                                            hexadecimal_input.setText(NumberConverter.decimalToHexadecimal(decimal_input.text.toString()), TextView.BufferType.EDITABLE)
+                                    if (!rangeCheck_Decimal(input)){
+                                        setErrorColor(decimal, decimal_input)
+                                        decimal.text = resources.getString(R.string.error_out_of_range)
+                                    }
+                                    else {
+                                        resetColor_Decimal()
+                                        when (getBitRepresentation()){
+                                            0 -> {
+                                                binary_input.setText(SimpleMath.formatBinary(NumberConverter.decimalToBinary(input), getBitLength()), TextView.BufferType.EDITABLE)
+                                                octal_input.setText(NumberConverter.decimalToOctal(input), TextView.BufferType.EDITABLE)
+                                                hexadecimal_input.setText(NumberConverter.decimalToHexadecimal(input), TextView.BufferType.EDITABLE)
+                                            }
+                                            1 -> {
+                                                val binaryValue = NumberConverter.decimalToBinary_OnesComplement(input, getBitLength())
+                                                binary_input.setText(binaryValue, TextView.BufferType.EDITABLE)
+                                                octal_input.setText(NumberConverter.binaryToOctal(SimpleMath.reserveFormatBinary(binaryValue)), TextView.BufferType.EDITABLE)
+                                                hexadecimal_input.setText(NumberConverter.binaryToHexadecimal(SimpleMath.reserveFormatBinary(binaryValue)), TextView.BufferType.EDITABLE)
+                                            }
+                                            else -> {
+                                                val binaryValue = NumberConverter.decimalToBinary_OnesComplement(input, getBitLength())
+                                                binary_input.setText(NumberConverter.decimalToBinary_OnesComplement(binaryValue, getBitLength()), TextView.BufferType.EDITABLE)
+                                                octal_input.setText(NumberConverter.decimalToOctal(SimpleMath.reserveFormatBinary(binaryValue)), TextView.BufferType.EDITABLE)
+                                                hexadecimal_input.setText(NumberConverter.decimalToHexadecimal(SimpleMath.reserveFormatBinary(binaryValue)), TextView.BufferType.EDITABLE)
+                                            }
                                         }
                                     }
                                 }
                             }
                             binary_input -> {
-                                if (!SimpleMath.isValidBinary(p0.toString().replace(" ", ""))){
+                                if (!SimpleMath.isValidBinary(input.replace(" ", ""))){
                                     setErrorColor(binary, binary_input)
                                     binary.text = resources.getString(R.string.error_binary)
                                 }
                                 else {
-                                    val actualBinaryNumber = SimpleMath.reserveFormatBinary(p0.toString())
+                                    val actualBinaryNumber = SimpleMath.reserveFormatBinary(input)
                                     val decimalEquivalence = NumberConverter.binaryToDecimal(actualBinaryNumber)
                                     if (!rangeCheck_Decimal(decimalEquivalence)){
                                         setErrorColor(binary, binary_input)
@@ -163,12 +169,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 }
                             }
                             hexadecimal_input -> {
-                                if (!SimpleMath.isValidHex(p0!!.toString())){
+                                if (!SimpleMath.isValidHex(input)){
                                     setErrorColor(hexadecimal, hexadecimal_input)
                                     hexadecimal.text = resources.getString(R.string.error_hex)
                                 }
                                 else {
-                                    val decimalEquivalence = NumberConverter.hexadecimalToDecimal(hexadecimal_input.text.toString().trim())
+                                    val decimalEquivalence = NumberConverter.hexadecimalToDecimal(input)
                                     if (!rangeCheck_Decimal(decimalEquivalence)){
                                         setErrorColor(hexadecimal, hexadecimal_input)
                                         hexadecimal.text = resources.getString(R.string.error_out_of_range)
@@ -176,8 +182,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                     else {
                                         resetColor_Hex()
                                         decimal_input.setText(decimalEquivalence, TextView.BufferType.EDITABLE)
-                                        binary_input.setText(SimpleMath.formatBinary(NumberConverter.hexadecimalToBinary(hexadecimal_input.text.toString()), getBitLength()), TextView.BufferType.EDITABLE)
-                                        octal_input.setText(NumberConverter.hexadecimalToOctal(hexadecimal_input.text.toString()), TextView.BufferType.EDITABLE)
+                                        binary_input.setText(SimpleMath.formatBinary(NumberConverter.hexadecimalToBinary(input), getBitLength()), TextView.BufferType.EDITABLE)
+                                        octal_input.setText(NumberConverter.hexadecimalToOctal(input), TextView.BufferType.EDITABLE)
                                     }
                                 }
                             }
@@ -228,11 +234,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
                 radioButtonGroup[1] -> {
                     radioButtonGroup.filter { it != radioButtonGroup[1] }.forEach { it.isChecked = false }
-                    decimal_input.inputType = InputType.TYPE_CLASS_TEXT
+                    decimal_input.inputType = InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
                 }
                 else -> {
                     radioButtonGroup.filter { it != radioButtonGroup[2] }.forEach { it.isChecked = false }
-                    decimal_input.inputType = InputType.TYPE_CLASS_TEXT
+                    decimal_input.inputType = InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
                 }
             } }
         }

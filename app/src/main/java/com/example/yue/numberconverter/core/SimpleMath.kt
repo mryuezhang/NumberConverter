@@ -41,6 +41,8 @@ class SimpleMath {
             return result
         }
 
+        fun isValidDecimal(p0: String): Boolean = p0.matches("-?\\d+(\\d+)?".toRegex()) || p0 == "" || p0 == "-"
+
         fun isValidBinary(p0: String): Boolean =
                 (!(p0.contains("2") ||
                     p0.contains("3") ||
@@ -53,7 +55,7 @@ class SimpleMath {
 
         fun isValidOctal(p0: String): Boolean =
                 (!(p0.contains("8") ||
-                    p0.contains("9")) && p0.matches("-?\\d+(\\.\\d+)?".toRegex())) || p0 == ""
+                    p0.contains("9")) && p0.matches("\\d+(\\.\\d+)?".toRegex())) || p0 == ""
 
         fun isValidHex(p0: String): Boolean =
                 p0.matches("\\d+(\\.\\d+)?".toRegex()) ||
@@ -104,6 +106,7 @@ class SimpleMath {
         else trimZeroes(p0.replace(" ", ""))
 
         fun flipBit(bit: Char): Char = if (bit == '0') '1'
+        else if (bit == ' ') ' '
         else '0'
 
         fun flipBits(bitString: String): String = String(bitString.map { flipBit(it) }.toCharArray())
