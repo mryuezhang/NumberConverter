@@ -1,0 +1,265 @@
+/**
+ * <NumberConverter - A simple program that converts numeric values among decimal, binary, octal, and hexadecimal numeral systems.>
+ * Copyright (C) <2017>  <Yue Zhang>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
+ */
+package com.example.yue.numberconverter.ui
+
+import android.graphics.drawable.ColorDrawable
+import android.os.Bundle
+import android.support.design.widget.NavigationView
+import android.support.v4.content.ContextCompat
+import android.support.v4.view.GravityCompat
+import android.support.v7.app.ActionBarDrawerToggle
+import android.support.v7.app.AppCompatActivity
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.MenuItem
+import android.widget.EditText
+import android.widget.RadioButton
+import android.widget.TextView
+import com.example.yue.numberconverter.R
+import com.example.yue.numberconverter.core.NumberConverter
+import com.example.yue.numberconverter.core.SimpleMath
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.content_main.*
+
+
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        setSupportActionBar(toolbar)
+
+        val toggle = ActionBarDrawerToggle(
+                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        drawer_layout.addDrawerListener(toggle)
+        toggle.syncState()
+
+        nav_view.setNavigationItemSelectedListener(this)
+
+        (nav_view.menu.getItem(0).subMenu.getItem(0).actionView as RadioButton).isChecked = true
+        (nav_view.menu.getItem(1).subMenu.getItem(0).actionView as RadioButton).isChecked = true
+
+        setUpEditTexts()
+        setUpBitLengthSwitches()
+        setUpBitRepresentationSwitch()
+    }
+
+    override fun onBackPressed() {
+        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
+            drawer_layout.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        return true
+    }
+
+    //MARK: Private methods
+    private fun setUpEditTexts(){
+        val editTexts:Array<EditText> = arrayOf(decimal_input, binary_input, octal_input, hexadecimal_input)
+
+        editTexts.forEach {
+            it.setOnLongClickListener {
+            (it as EditText).text.clear()
+            true
+        }
+            it.addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(p0: Editable?) {
+                }
+
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                }
+
+                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    if (it.hasFocus()){
+                        when(it){
+                            decimal_input -> {
+                                if (!rangeCheck_Decimal(p0.toString())){
+                                    setErrorColor(decimal, decimal_input)
+                                    decimal.text = resources.getString(R.string.error_out_of_range)
+
+                                }
+                                else {
+                                    resetColor_Decimal()
+                                    binary_input.setText(SimpleMath.formatBinary(NumberConverter.decimalToBinary(decimal_input.text.toString()), getBitLength()), TextView.BufferType.EDITABLE)
+                                    octal_input.setText(NumberConverter.decimalToOctal(decimal_input.text.toString()), TextView.BufferType.EDITABLE)
+                                    hexadecimal_input.setText(NumberConverter.decimalToHexadecimal(decimal_input.text.toString()), TextView.BufferType.EDITABLE)
+                                }
+                            }
+                            binary_input -> {
+                                val actualBinaryNumber = SimpleMath.reserveFormatBinary(binary_input.text.toString())
+                                if (!SimpleMath.isValidBinary(actualBinaryNumber)){
+                                    setErrorColor(binary, binary_input)
+                                    binary.text = resources.getString(R.string.error_binary)
+                                }
+                                else {
+                                    val decimalEquivalence = NumberConverter.binaryToDecimal(actualBinaryNumber)
+                                    if (!rangeCheck_Decimal(decimalEquivalence)){
+                                        setErrorColor(binary, binary_input)
+                                        binary.text = resources.getString(R.string.error_out_of_range)
+                                    }
+                                    else {
+                                        resetColor_Binary()
+                                        decimal_input.setText(decimalEquivalence, TextView.BufferType.EDITABLE)
+                                        octal_input.setText(NumberConverter.binaryToOctal(actualBinaryNumber), TextView.BufferType.EDITABLE)
+                                        hexadecimal_input.setText(NumberConverter.binaryToHexadecimal(actualBinaryNumber), TextView.BufferType.EDITABLE)
+                                    }
+                                }
+                            }
+                            octal_input -> {
+                                if (!SimpleMath.isValidOctal(p0!!.toString())){
+                                    setErrorColor(octal, octal_input)
+                                    octal.text = resources.getString(R.string.error_oct)
+                                }
+                                else{
+                                    val decimalEquivalence = NumberConverter.octalToDecimal(octal_input.text.toString())
+                                    if (!rangeCheck_Decimal(decimalEquivalence)){
+                                        setErrorColor(octal, octal_input)
+                                        octal.text = resources.getString(R.string.error_out_of_range)
+                                    }
+                                    else {
+                                        resetColor_Octal()
+                                        decimal_input.setText(decimalEquivalence, TextView.BufferType.EDITABLE)
+                                        binary_input.setText(SimpleMath.formatBinary(NumberConverter.octalToBinary(octal_input.text.toString()), getBitLength()), TextView.BufferType.EDITABLE)
+                                        hexadecimal_input.setText(NumberConverter.octalToHexadecimal(octal_input.text.toString()), TextView.BufferType.EDITABLE)
+                                    }
+                                }
+                            }
+                            hexadecimal_input -> {
+                                if (!SimpleMath.isValidHex(p0!!.toString())){
+                                    setErrorColor(hexadecimal, hexadecimal_input)
+                                    hexadecimal.text = resources.getString(R.string.error_hex)
+                                }
+                                else {
+                                    val decimalEquivalence = NumberConverter.hexadecimalToDecimal(hexadecimal_input.text.toString().trim())
+                                    if (!rangeCheck_Decimal(decimalEquivalence)){
+                                        setErrorColor(hexadecimal, hexadecimal_input)
+                                        hexadecimal.text = resources.getString(R.string.error_out_of_range)
+                                    }
+                                    else {
+                                        resetColor_Hex()
+                                        decimal_input.setText(decimalEquivalence, TextView.BufferType.EDITABLE)
+                                        binary_input.setText(SimpleMath.formatBinary(NumberConverter.hexadecimalToBinary(hexadecimal_input.text.toString()), getBitLength()), TextView.BufferType.EDITABLE)
+                                        octal_input.setText(NumberConverter.hexadecimalToOctal(hexadecimal_input.text.toString()), TextView.BufferType.EDITABLE)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+        }
+    }
+
+    private fun bitLengthRadioGroup(): Array<RadioButton>{
+        return arrayOf((nav_view.menu.getItem(0).subMenu.getItem(0).actionView as RadioButton),
+                (nav_view.menu.getItem(0).subMenu.getItem(1).actionView as RadioButton),
+                (nav_view.menu.getItem(0).subMenu.getItem(2).actionView as RadioButton))
+    }
+
+    private fun setUpBitLengthSwitches(){
+        val bitLengthRadioButtons: Array<RadioButton> = bitLengthRadioGroup()
+
+        bitLengthRadioButtons.forEach { it.setOnClickListener {
+            when (it) {
+                bitLengthRadioButtons[0] -> bitLengthRadioButtons.filter { it != bitLengthRadioButtons[0] }.forEach { it.isChecked = false }
+                bitLengthRadioButtons[1] -> bitLengthRadioButtons.filter { it != bitLengthRadioButtons[1] }.forEach { it.isChecked = false }
+                else -> bitLengthRadioButtons.filter { it != bitLengthRadioButtons[2] }.forEach { it.isChecked = false }
+            } }
+        }
+
+    }
+
+    private fun setUpBitRepresentationSwitch(){
+        val radioButtonGroup: Array<RadioButton> = arrayOf((nav_view.menu.getItem(1).subMenu.getItem(0).actionView as RadioButton),
+                (nav_view.menu.getItem(1).subMenu.getItem(1).actionView as RadioButton),
+                (nav_view.menu.getItem(1).subMenu.getItem(2).actionView as RadioButton))
+
+        radioButtonGroup.forEach { it.setOnClickListener {
+            when (it) {
+                radioButtonGroup[0] -> radioButtonGroup.filter { it != radioButtonGroup[0] }.forEach { it.isChecked = false }
+                radioButtonGroup[1] -> radioButtonGroup.filter { it != radioButtonGroup[1] }.forEach { it.isChecked = false }
+                else -> radioButtonGroup.filter { it != radioButtonGroup[2] }.forEach { it.isChecked = false }
+            } }
+        }
+    }
+
+    private fun getBitLength(): Int{
+        val bitLengthRadioButtons: Array<RadioButton> = bitLengthRadioGroup()
+        return when {
+            bitLengthRadioButtons[2].isChecked -> 32
+            bitLengthRadioButtons[1].isChecked -> 16
+            else -> 8
+        }
+    }
+
+    private fun rangeCheck_Decimal(p0: String): Boolean {
+        return if (p0 == "") true
+        else {
+            try {
+                when(getBitLength()){
+                    32 -> p0.toLong() in 0..4294967295
+                    16 -> p0.toLong() in 0..65536
+                    else  -> p0.toLong() in 0..256
+                }
+            } catch (e: NumberFormatException){
+                false
+            }
+        }
+    }
+
+    private fun setErrorColor(p0: TextView, p1: EditText){
+        p0.setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.colorError))
+        p1.setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.colorError))
+    }
+
+    private fun resetColor_Decimal(){
+        if ((decimal_input.background as ColorDrawable).color != R.color.colorPrimary) {
+            decimal_input.setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.colorPrimary))
+            decimal.setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.colorPrimary))
+            decimal.text = resources.getString(R.string.decimal)
+        }
+    }
+
+    private fun resetColor_Binary(){
+        if ((binary_input.background as ColorDrawable).color != R.color.colorBinary) {
+            binary_input.setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.colorBinary))
+            binary.setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.colorBinary))
+            binary.text = resources.getString(R.string.binary)
+        }
+    }
+
+    private fun resetColor_Octal(){
+        if ((octal_input.background as ColorDrawable).color != R.color.colorOct) {
+            octal_input.setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.colorOct))
+            octal.setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.colorOct))
+            octal.text = resources.getString(R.string.oct)
+        }
+    }
+
+    private fun resetColor_Hex(){
+        if ((hexadecimal_input.background as ColorDrawable).color != R.color.colorHex) {
+            hexadecimal_input.setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.colorHex))
+            hexadecimal.setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.colorHex))
+            hexadecimal.text = resources.getString(R.string.hex)
+        }
+    }
+}

@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">NumberConverter</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="binary">Binary</string>
+    <string name="oct">Octal</string>
+    <string name="decimal">Decimal</string>
+    <string name="hex">Hexadecimal</string>
+
+    <string name="error_binary">Invalid Binary Number</string>
+    <string name="error_oct">Invalid Octal Number</string>
+    <string name="error_hex">Invalid Hex Number</string>
+    <string name="error_decimal">Error</string>
+    <string name="error_out_of_range">Out of range!</string>
+</resources>

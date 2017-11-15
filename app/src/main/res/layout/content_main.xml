@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.example.yue.numberconverter.ui.MainActivity"
+    android:fillViewport="true"
+    android:layout_weight="8"
+    tools:showIn="@layout/app_bar_main">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/decimal"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="@string/decimal"
+            android:textSize="@dimen/text_34sp"
+            android:textColor="@color/colorBlack"
+            android:background="@color/colorPrimary"/>
+
+        <EditText
+            android:id="@+id/decimal_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:ems="10"
+            android:gravity="bottom|end"
+            android:inputType="number"
+            android:padding="16dp"
+            android:textAlignment="gravity"
+            android:textColor="@color/colorBlack"
+            android:textSize="@dimen/text_Title" />
+
+        <TextView
+            android:id="@+id/binary"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="@string/binary"
+            android:textSize="@dimen/text_34sp"
+            android:textColor="@color/colorBlack"
+            android:background="@color/colorBinary"/>
+
+        <EditText
+            android:id="@+id/binary_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/colorBinary"
+            android:ems="10"
+            android:gravity="bottom|end"
+            android:inputType="number"
+            android:padding="16dp"
+            android:textAlignment="gravity"
+            android:textColor="@color/colorBlack"
+            android:textSize="@dimen/text_Title" />
+
+        <TextView
+            android:id="@+id/octal"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/oct"
+            android:padding="16dp"
+            android:textColor="@color/colorBlack"
+            android:textSize="@dimen/text_34sp"
+            android:background="@color/colorOct"/>
+
+        <EditText
+            android:id="@+id/octal_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/colorOct"
+            android:ems="10"
+            android:gravity="bottom|end"
+            android:inputType="number"
+            android:padding="16dp"
+            android:textAlignment="gravity"
+            android:textColor="@color/colorBlack"
+            android:textSize="@dimen/text_Title" />
+
+        <TextView
+            android:id="@+id/hexadecimal"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/hex"
+            android:padding="16dp"
+            android:textColor="@color/colorBlack"
+            android:textSize="@dimen/text_34sp"
+            android:background="@color/colorHex"/>
+
+        <EditText
+            android:id="@+id/hexadecimal_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/colorHex"
+            android:ems="10"
+            android:gravity="bottom|end"
+            android:inputType="text"
+            android:padding="16dp"
+            android:textAlignment="gravity"
+            android:textColor="@color/colorBlack"
+            android:textSize="@dimen/text_Title" />
+    </LinearLayout>
+</ScrollView>

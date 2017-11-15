@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <item android:title="Bit length">
+        <menu>
+            <item
+                android:id="@+id/eight_bit"
+                android:title="8 bits"
+                app:actionViewClass="android.widget.RadioButton" />
+            <item
+                android:id="@+id/sixteen_bit"
+                app:actionViewClass="android.widget.RadioButton"
+                android:title="16 bits" />
+            <item
+                android:id="@+id/thirty_two__bit"
+                app:actionViewClass="android.widget.RadioButton"
+                android:title="32 bits" />
+        </menu>
+    </item>
+
+    <item android:title="Binary representation">
+        <menu>
+            <item
+                android:id="@+id/unsigned"
+                android:title="Unsigned"
+                app:actionViewClass="android.widget.RadioButton" />
+            <item
+                android:id="@+id/one_complement"
+                app:actionViewClass="android.widget.RadioButton"
+                android:title="1's complement" />
+            <item
+                android:id="@+id/two_complement"
+                app:actionViewClass="android.widget.RadioButton"
+                android:title="2's complement" />
+        </menu>
+    </item>
+</menu>
