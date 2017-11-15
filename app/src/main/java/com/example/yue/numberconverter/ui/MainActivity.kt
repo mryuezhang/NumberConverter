@@ -25,7 +25,9 @@ import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
+import android.text.InputType
 import android.text.TextWatcher
+import android.util.Log
 import android.view.MenuItem
 import android.widget.EditText
 import android.widget.RadioButton
@@ -52,12 +54,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         nav_view.setNavigationItemSelectedListener(this)
 
-        (nav_view.menu.getItem(0).subMenu.getItem(0).actionView as RadioButton).isChecked = true
-        (nav_view.menu.getItem(1).subMenu.getItem(0).actionView as RadioButton).isChecked = true
-
         setUpEditTexts()
+
         setUpBitLengthSwitches()
         setUpBitRepresentationSwitch()
+
+        (nav_view.menu.getItem(0).subMenu.getItem(0).actionView as RadioButton).isChecked = true
+        (nav_view.menu.getItem(1).subMenu.getItem(0).actionView as RadioButton).isChecked = true
     }
 
     override fun onBackPressed() {
@@ -99,18 +102,34 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 }
                                 else {
                                     resetColor_Decimal()
-                                    binary_input.setText(SimpleMath.formatBinary(NumberConverter.decimalToBinary(decimal_input.text.toString()), getBitLength()), TextView.BufferType.EDITABLE)
-                                    octal_input.setText(NumberConverter.decimalToOctal(decimal_input.text.toString()), TextView.BufferType.EDITABLE)
-                                    hexadecimal_input.setText(NumberConverter.decimalToHexadecimal(decimal_input.text.toString()), TextView.BufferType.EDITABLE)
+                                    Log.i(null, getBitRepresentation().toString())
+                                    when (getBitRepresentation()){
+                                        0 -> {
+                                            binary_input.setText(SimpleMath.formatBinary(NumberConverter.decimalToBinary(decimal_input.text.toString()), getBitLength()), TextView.BufferType.EDITABLE)
+                                            octal_input.setText(NumberConverter.decimalToOctal(decimal_input.text.toString()), TextView.BufferType.EDITABLE)
+                                            hexadecimal_input.setText(NumberConverter.decimalToHexadecimal(decimal_input.text.toString()), TextView.BufferType.EDITABLE)
+                                        }
+                                        1 -> {
+                                            val binaryValue = NumberConverter.decimalToBinary_OnesComplement(decimal_input.text.toString(), getBitLength())
+                                            binary_input.setText(binaryValue, TextView.BufferType.EDITABLE)
+                                            octal_input.setText(NumberConverter.binaryToOctal(binaryValue), TextView.BufferType.EDITABLE)
+                                            hexadecimal_input.setText(NumberConverter.binaryToHexadecimal(binaryValue), TextView.BufferType.EDITABLE)
+                                        }
+                                        else -> {
+                                            binary_input.setText(NumberConverter.decimalToBinary_OnesComplement(decimal_input.text.toString(), getBitLength()), TextView.BufferType.EDITABLE)
+                                            octal_input.setText(NumberConverter.decimalToOctal(decimal_input.text.toString()), TextView.BufferType.EDITABLE)
+                                            hexadecimal_input.setText(NumberConverter.decimalToHexadecimal(decimal_input.text.toString()), TextView.BufferType.EDITABLE)
+                                        }
+                                    }
                                 }
                             }
                             binary_input -> {
-                                val actualBinaryNumber = SimpleMath.reserveFormatBinary(binary_input.text.toString())
-                                if (!SimpleMath.isValidBinary(actualBinaryNumber)){
+                                if (!SimpleMath.isValidBinary(p0.toString().replace(" ", ""))){
                                     setErrorColor(binary, binary_input)
                                     binary.text = resources.getString(R.string.error_binary)
                                 }
                                 else {
+                                    val actualBinaryNumber = SimpleMath.reserveFormatBinary(p0.toString())
                                     val decimalEquivalence = NumberConverter.binaryToDecimal(actualBinaryNumber)
                                     if (!rangeCheck_Decimal(decimalEquivalence)){
                                         setErrorColor(binary, binary_input)
@@ -175,12 +194,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 (nav_view.menu.getItem(0).subMenu.getItem(2).actionView as RadioButton))
     }
 
+    private fun bitRepresentationRadioGroup(): Array<RadioButton>{
+        return arrayOf((nav_view.menu.getItem(1).subMenu.getItem(0).actionView as RadioButton),
+                (nav_view.menu.getItem(1).subMenu.getItem(1).actionView as RadioButton),
+                (nav_view.menu.getItem(1).subMenu.getItem(2).actionView as RadioButton))
+    }
+
     private fun setUpBitLengthSwitches(){
         val bitLengthRadioButtons: Array<RadioButton> = bitLengthRadioGroup()
 
         bitLengthRadioButtons.forEach { it.setOnClickListener {
             when (it) {
-                bitLengthRadioButtons[0] -> bitLengthRadioButtons.filter { it != bitLengthRadioButtons[0] }.forEach { it.isChecked = false }
+                bitLengthRadioButtons[0] -> {
+                    bitLengthRadioButtons.filter { it != bitLengthRadioButtons[0] }.forEach { it.isChecked = false }
+                }
                 bitLengthRadioButtons[1] -> bitLengthRadioButtons.filter { it != bitLengthRadioButtons[1] }.forEach { it.isChecked = false }
                 else -> bitLengthRadioButtons.filter { it != bitLengthRadioButtons[2] }.forEach { it.isChecked = false }
             } }
@@ -195,9 +222,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         radioButtonGroup.forEach { it.setOnClickListener {
             when (it) {
-                radioButtonGroup[0] -> radioButtonGroup.filter { it != radioButtonGroup[0] }.forEach { it.isChecked = false }
-                radioButtonGroup[1] -> radioButtonGroup.filter { it != radioButtonGroup[1] }.forEach { it.isChecked = false }
-                else -> radioButtonGroup.filter { it != radioButtonGroup[2] }.forEach { it.isChecked = false }
+                radioButtonGroup[0] -> {
+                    radioButtonGroup.filter { it != radioButtonGroup[0] }.forEach { it.isChecked = false }
+                    decimal_input.inputType = InputType.TYPE_CLASS_NUMBER
+                }
+                radioButtonGroup[1] -> {
+                    radioButtonGroup.filter { it != radioButtonGroup[1] }.forEach { it.isChecked = false }
+                    decimal_input.inputType = InputType.TYPE_CLASS_TEXT
+                }
+                else -> {
+                    radioButtonGroup.filter { it != radioButtonGroup[2] }.forEach { it.isChecked = false }
+                    decimal_input.inputType = InputType.TYPE_CLASS_TEXT
+                }
             } }
         }
     }
@@ -211,14 +247,47 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    /**
+     * Return:
+     * 0 : unsigned
+     * 1 : 1's complement
+     * 2 : 2's complement
+     */
+    private fun getBitRepresentation(): Int{
+        val bitLengthRadioButtons: Array<RadioButton> = bitRepresentationRadioGroup()
+        return when {
+            bitLengthRadioButtons[2].isChecked -> 2
+            bitLengthRadioButtons[1].isChecked -> 1
+            else -> 0
+        }
+    }
+
     private fun rangeCheck_Decimal(p0: String): Boolean {
-        return if (p0 == "") true
+        return if (p0 == "" || p0 == "-") true
         else {
             try {
-                when(getBitLength()){
-                    32 -> p0.toLong() in 0..4294967295
-                    16 -> p0.toLong() in 0..65536
-                    else  -> p0.toLong() in 0..256
+                when (getBitRepresentation()){
+                    0 -> {
+                        when(getBitLength()){
+                            32 -> p0.toLong() in 0..4294967295
+                            16 -> p0.toLong() in 0..65536
+                            else  -> p0.toLong() in 0..255
+                        }
+                    }
+                    1 -> {
+                        when(getBitLength()){
+                            32 -> p0.toDouble() in -2147483647..2147483647
+                            16 -> p0.toDouble() in -32767..32767
+                            else  -> p0.toDouble() in -127..127
+                        }
+                    }
+                    else -> {
+                        when(getBitLength()){
+                            32 -> p0.toDouble() in -2147483647..2147483648
+                            16 -> p0.toDouble() in -32767..32768
+                            else  -> p0.toDouble() in -128..127
+                        }
+                    }
                 }
             } catch (e: NumberFormatException){
                 false
